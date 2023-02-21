@@ -1,38 +1,25 @@
 import { useState } from 'react';
-import { createApi } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // --------------- API --------------- //
 
 export const api = createApi({
-  baseQuery: () => {},
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://pokeapi.co/api/v2/',
+  }),
   endpoints: (build) => ({
     getPokemons: build.query({
-      async queryFn() {
-        const response = await fetch(
-          'https://pokeapi.co/api/v2/pokemon?limit=9'
-        );
-        if (response.ok) {
-          const data = await response.json();
-          return { data };
-        } else {
-          return { error: 'Something went wrong while fetching Pokemons' };
-        }
+      query() {
+        return {
+          url: 'pokemon',
+          params: {
+            limit: 9,
+          },
+        };
       },
     }),
     getPokemonDetails: build.query({
-      async queryFn({ name }) {
-        const response = await fetch(
-          `https://pokeapi.co/api/v2/pokemon/${name}/`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          return { data };
-        } else {
-          return {
-            error: 'Something went wrong while fetching Pokemon details',
-          };
-        }
-      },
+      query: ({ name }) => `pokemon/${name}`,
     }),
   }),
 });
