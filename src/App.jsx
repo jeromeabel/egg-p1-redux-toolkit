@@ -1,26 +1,35 @@
 import { useState } from 'react';
-import POKEMONS from './data';
-import { POKEMONS_DETAILS } from './data';
 import { createApi } from '@reduxjs/toolkit/query/react';
 
-function simulateLoading() {
-  return new Promise((resolve) => setTimeout(resolve, 1000));
-}
+// --------------- API --------------- //
 
 export const api = createApi({
   baseQuery: () => {},
   endpoints: (build) => ({
     getPokemons: build.query({
-      // query: () => '/',
       async queryFn() {
-        await simulateLoading();
-        return { data: POKEMONS };
+        const response = await fetch(
+          'https://pokeapi.co/api/v2/pokemon?limit=9'
+        );
+        if (response.ok) {
+          const data = await response.json();
+          return { data };
+        } else {
+          return { error: 'Something went wrong while fetching Pokemons' };
+        }
       },
     }),
     getPokemonDetails: build.query({
       async queryFn() {
-        await simulateLoading();
-        return { data: POKEMONS_DETAILS };
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon/1/');
+        if (response.ok) {
+          const data = await response.json();
+          return { data };
+        } else {
+          return {
+            error: 'Something went wrong while fetching Pokemon details',
+          };
+        }
       },
     }),
   }),
@@ -28,6 +37,7 @@ export const api = createApi({
 
 const { useGetPokemonsQuery, useGetPokemonDetailsQuery } = api;
 
+// --------------- APP --------------- //
 function App() {
   const [selectedPokemon, selectPokemon] = useState(undefined);
 
@@ -52,10 +62,11 @@ function App() {
 
 export default App;
 
+// --------------- COMPONENTS --------------- //
+
 function PokemonList({ onPokemonSelected }) {
-  // const data = POKEMONS;
   const { data, isLoading, isError, isSuccess } = useGetPokemonsQuery();
-  console.log(isLoading);
+
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -85,15 +96,13 @@ const listFormatter = new Intl.ListFormat('en-GB', {
   type: 'conjunction',
 });
 function PokemonDetails({ pokemonName }) {
-  // const data = POKEMONS_DETAILS;
-
   const { data, isLoading, isError, isSuccess } = useGetPokemonDetailsQuery();
 
   if (isLoading) {
     return <p>Loading...</p>;
   }
   if (isError) {
-    return <p>Someting went wrong!</p>;
+    return <p>Something went wrong!</p>;
   }
   if (isSuccess) {
     return (
