@@ -9,10 +9,17 @@ const cartSlice = createSlice({
       if (state.items[id]) state.items[id]++;
       else state.items[id] = 1;
     },
+    removeFromCart(state, action) {
+      delete state.items[action.payload];
+    },
+    updateQuantity(state, action) {
+      const { id, quantity } = action.payload;
+      state.items[id] = quantity;
+    },
   },
 });
 
-export const { addToCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity } = cartSlice.actions;
 export default cartSlice.reducer;
 
 //Selectors
