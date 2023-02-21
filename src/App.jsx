@@ -20,8 +20,10 @@ export const api = createApi({
       },
     }),
     getPokemonDetails: build.query({
-      async queryFn() {
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon/1/');
+      async queryFn({ name }) {
+        const response = await fetch(
+          `https://pokeapi.co/api/v2/pokemon/${name}/`
+        );
         if (response.ok) {
           const data = await response.json();
           return { data };
@@ -96,7 +98,9 @@ const listFormatter = new Intl.ListFormat('en-GB', {
   type: 'conjunction',
 });
 function PokemonDetails({ pokemonName }) {
-  const { data, isLoading, isError, isSuccess } = useGetPokemonDetailsQuery();
+  const { data, isLoading, isError, isSuccess } = useGetPokemonDetailsQuery({
+    name: pokemonName,
+  });
 
   if (isLoading) {
     return <p>Loading...</p>;
